@@ -18,7 +18,7 @@ fn test_schema_created() {
     let db = Database::create(&db_path).unwrap();
 
     // Verify tables exist
-    let conn = db.connection();
+    let conn = db.connection().borrow();
     let mut stmt = conn.prepare("SELECT name FROM sqlite_master WHERE type='table'").unwrap();
     let tables: Vec<String> = stmt
         .query_map([], |row| row.get(0))

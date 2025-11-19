@@ -3,6 +3,7 @@
 
 use crate::Result;
 use rusqlite::{Connection, params, OptionalExtension};
+use std::cell::RefCell;
 use std::path::Path;
 
 #[derive(Debug, Clone)]
@@ -18,7 +19,7 @@ pub struct Sticky {
 }
 
 pub struct Database {
-    conn: Connection,
+    conn: RefCell<Connection>,
 }
 
 impl Database {
@@ -59,21 +60,24 @@ impl Database {
             [],
         )?;
 
-        Ok(Self { conn })
+        Ok(Self { conn: RefCell::new(conn) })
     }
 
-    pub fn connection(&self) -> &Connection {
+    pub fn connection(&self) -> &RefCell<Connection> {
         &self.conn
     }
 
     pub fn insert_sticky(&self, sticky: &Sticky) -> Result<()> {
+        let mut conn = self.conn.borrow_mut();
+        let tx = conn.transaction()?;
+
         // Delete from FTS index first to avoid corruption
-        self.conn.execute(
+        tx.execute(
             "DELETE FROM stickies_fts WHERE uuid = ?1",
             params![&sticky.uuid],
         )?;
 
-        self.conn.execute(
+        tx.execute(
             "INSERT OR REPLACE INTO stickies
              (uuid, content_text, rtf_data, plist_metadata, color, modified_at, created_at, source_machine)
              VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
@@ -90,16 +94,19 @@ impl Database {
         )?;
 
         // Insert into FTS index
-        self.conn.execute(
+        tx.execute(
             "INSERT INTO stickies_fts (uuid, content_text) VALUES (?1, ?2)",
             params![&sticky.uuid, &sticky.content_text],
         )?;
+
+        tx.commit()?;
 
         Ok(())
     }
 
     pub fn get_sticky(&self, uuid: &str) -> Result<Option<Sticky>> {
-        let mut stmt = self.conn.prepare(
+        let conn = self.conn.borrow();
+        let mut stmt = conn.prepare(
             "SELECT uuid, content_text, rtf_data, plist_metadata, color, modified_at, created_at, source_machine
              FROM stickies WHERE uuid = ?1"
         )?;
@@ -121,7 +128,8 @@ impl Database {
     }
 
     pub fn get_all_uuids(&self) -> Result<Vec<String>> {
-        let mut stmt = self.conn.prepare("SELECT uuid FROM stickies")?;
+        let conn = self.conn.borrow();
+        let mut stmt = conn.prepare("SELECT uuid FROM stickies")?;
         let uuids = stmt
             .query_map([], |row| row.get(0))?
             .collect::<std::result::Result<Vec<_>, _>>()?;
@@ -129,7 +137,8 @@ impl Database {
     }
 
     pub fn search(&self, query: &str) -> Result<Vec<Sticky>> {
-        let mut stmt = self.conn.prepare(
+        let conn = self.conn.borrow();
+        let mut stmt = conn.prepare(
             "SELECT s.uuid, s.content_text, s.rtf_data, s.plist_metadata, s.color, s.modified_at, s.created_at, s.source_machine
              FROM stickies s
              JOIN stickies_fts fts ON s.uuid = fts.uuid
