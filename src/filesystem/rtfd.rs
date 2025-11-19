@@ -63,4 +63,34 @@ impl RtfdBundle {
             .as_secs() as i64;
         Ok(timestamp)
     }
+
+    pub fn write(&self, rtfd_path: &Path) -> Result<()> {
+        fs::create_dir_all(rtfd_path)?;
+
+        let rtf_path = rtfd_path.join("TXT.rtf");
+        fs::write(&rtf_path, &self.rtf_data)?;
+
+        for attachment in &self.attachments {
+            let attachment_path = rtfd_path.join(&attachment.filename);
+            fs::write(&attachment_path, &attachment.content)?;
+        }
+
+        Ok(())
+    }
+
+    pub fn create_minimal(text: &str) -> Self {
+        let rtf_data = format!(
+            "{{\\rtf1\\ansi\\ansicpg1252\\cocoartf2820\n\
+             {{\\fonttbl\\f0\\fswiss\\fcharset0 Helvetica;}}\n\
+             {{\\colortbl;\\red255\\green255\\blue255;}}\n\
+             \\pard\\tx560\\tx1120\\tx1680\\tx2240\\tx2800\\tx3360\\tx3920\\tx4480\\tx5040\\tx5600\\tx6160\\tx6720\\pardirnatural\\partightenfactor0\n\
+             \\f0\\fs24 \\cf0 {}}}",
+            text
+        );
+
+        Self {
+            rtf_data: rtf_data.into_bytes(),
+            attachments: vec![],
+        }
+    }
 }
