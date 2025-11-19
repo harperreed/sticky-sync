@@ -39,6 +39,18 @@ enum Commands {
         #[arg(long)]
         color: Option<String>,
     },
+
+    /// List all stickies
+    List {
+        #[arg(long)]
+        color: Option<String>,
+    },
+
+    /// Show a specific sticky by UUID
+    Show {
+        /// UUID of the sticky to display
+        uuid: String,
+    },
 }
 
 fn main() -> Result<()> {
@@ -53,6 +65,12 @@ fn main() -> Result<()> {
         }
         Commands::Search { query, color } => {
             commands::search::run(&query, color.as_deref())
+        }
+        Commands::List { color } => {
+            commands::list::run(color.as_deref())
+        }
+        Commands::Show { uuid } => {
+            commands::show::run(&uuid)
         }
     }
 }

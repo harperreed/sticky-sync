@@ -6,6 +6,7 @@ A Rust CLI tool to sync macOS Stickies across machines using a portable SQLite d
 
 - ✅ Bidirectional sync between Stickies.app and SQLite database
 - ✅ Full-text search with FTS5
+- ✅ List and show stickies from CLI
 - ✅ Create new stickies from CLI
 - ✅ Preserve complete RTFD formatting (text + images)
 - ✅ Configurable database location (XDG or iCloud)
@@ -39,6 +40,19 @@ sticky new "My new sticky note"
 ```bash
 sticky search "meeting notes"
 sticky search --color yellow "todo"
+```
+
+### List all stickies
+
+```bash
+sticky list
+sticky list --color yellow
+```
+
+### Show a specific sticky
+
+```bash
+sticky show <uuid>
 ```
 
 ## Configuration
