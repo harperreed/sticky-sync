@@ -59,7 +59,7 @@ impl RtfdBundle {
         let modified = metadata.modified()?;
         let timestamp = modified
             .duration_since(std::time::UNIX_EPOCH)
-            .map_err(|e| StickyError::Io(std::io::Error::new(std::io::ErrorKind::Other, e)))?
+            .map_err(|e| StickyError::Io(std::io::Error::other(e)))?
             .as_secs() as i64;
         Ok(timestamp)
     }
