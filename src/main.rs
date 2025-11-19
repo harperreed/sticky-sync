@@ -51,6 +51,9 @@ enum Commands {
         /// UUID of the sticky to display
         uuid: String,
     },
+
+    /// Send HUP signal to reload Stickies.app
+    Hup,
 }
 
 fn main() -> Result<()> {
@@ -71,6 +74,9 @@ fn main() -> Result<()> {
         }
         Commands::Show { uuid } => {
             commands::show::run(&uuid)
+        }
+        Commands::Hup => {
+            commands::hup::run()
         }
     }
 }

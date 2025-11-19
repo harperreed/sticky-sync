@@ -55,6 +55,14 @@ sticky list --color yellow
 sticky show <uuid>
 ```
 
+### Reload Stickies.app
+
+```bash
+sticky hup
+```
+
+Sends a HUP signal to Stickies.app to reload it. Useful after manually editing files or syncing from another machine.
+
 ## Configuration
 
 Config file: `~/.config/sticky-situation/config.toml`
