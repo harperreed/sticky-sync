@@ -54,6 +54,13 @@ enum Commands {
 
     /// Send HUP signal to reload Stickies.app
     Hup,
+
+    /// Show or edit configuration file
+    Config {
+        /// Open config in $EDITOR
+        #[arg(long, short)]
+        edit: bool,
+    },
 }
 
 fn main() -> Result<()> {
@@ -66,5 +73,6 @@ fn main() -> Result<()> {
         Commands::List { color } => commands::list::run(color.as_deref()),
         Commands::Show { uuid } => commands::show::run(&uuid),
         Commands::Hup => commands::hup::run(),
+        Commands::Config { edit } => commands::config::run(edit),
     }
 }

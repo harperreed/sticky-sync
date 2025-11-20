@@ -1,6 +1,7 @@
 // ABOUTME: CLI command implementations
-// ABOUTME: Contains sync, new, search, list, show, and hup command handlers
+// ABOUTME: Contains sync, new, search, list, show, hup, and config command handlers
 
+pub mod config;
 pub mod hup;
 pub mod list;
 pub mod new;
