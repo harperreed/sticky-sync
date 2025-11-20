@@ -2,7 +2,7 @@
 // ABOUTME: Extracts color, position, and window state from plist dictionaries
 
 use crate::{Result, StickyError};
-use plist::{Value, Dictionary};
+use plist::{Dictionary, Value};
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -76,7 +76,8 @@ pub fn read_stickies_state(path: &Path) -> Result<HashMap<String, StickyMetadata
     }
 
     // Fall back to dictionary format (StickiesState.plist)
-    let dict = value.as_dictionary()
+    let dict = value
+        .as_dictionary()
         .ok_or_else(|| StickyError::Config("Invalid plist format".into()))?;
 
     let mut result = HashMap::new();

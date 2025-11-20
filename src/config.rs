@@ -41,8 +41,8 @@ impl Config {
         }
 
         let contents = fs::read_to_string(&config_path)?;
-        let config: Config = toml::from_str(&contents)
-            .map_err(|e| StickyError::Config(e.to_string()))?;
+        let config: Config =
+            toml::from_str(&contents).map_err(|e| StickyError::Config(e.to_string()))?;
 
         Ok(config)
     }

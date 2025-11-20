@@ -162,12 +162,10 @@ fn test_rtfd_with_attachments_workflow() {
     let rtfd_dir = dir.path().join("with-attachment.rtfd");
     let bundle = RtfdBundle {
         rtf_data: b"{\\rtf1\\ansi Test with image}".to_vec(),
-        attachments: vec![
-            sticky_situation::filesystem::rtfd::Attachment {
-                filename: "image.png".to_string(),
-                content: b"fake image data".to_vec(),
-            },
-        ],
+        attachments: vec![sticky_situation::filesystem::rtfd::Attachment {
+            filename: "image.png".to_string(),
+            content: b"fake image data".to_vec(),
+        }],
     };
     bundle.write(&rtfd_dir).unwrap();
 
@@ -241,7 +239,10 @@ fn test_update_sticky_preserves_search() {
     // New search term should find it
     let new_results = db.search("information").unwrap();
     assert_eq!(new_results.len(), 1);
-    assert_eq!(new_results[0].content_text, "Updated content with new information");
+    assert_eq!(
+        new_results[0].content_text,
+        "Updated content with new information"
+    );
     assert_eq!(new_results[0].color, "blue");
 }
 

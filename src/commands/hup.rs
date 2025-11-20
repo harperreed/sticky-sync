@@ -1,14 +1,12 @@
 // ABOUTME: HUP command implementation
 // ABOUTME: Sends HUP signal to Stickies.app to reload it
 
-use sticky_situation::Result;
 use std::process::Command;
+use sticky_situation::Result;
 
 fn reload_stickies_app() -> Result<()> {
     // Check if Stickies is running
-    let output = Command::new("pgrep")
-        .arg("Stickies")
-        .output()?;
+    let output = Command::new("pgrep").arg("Stickies").output()?;
 
     if output.status.success() {
         println!("Restarting Stickies.app...");

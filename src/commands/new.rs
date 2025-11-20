@@ -1,29 +1,26 @@
 // ABOUTME: New command implementation
 // ABOUTME: Creates new sticky in filesystem and database, then reloads Stickies.app
 
+use std::path::PathBuf;
+use std::process::Command;
 use sticky_situation::{
-    Result, StickyError,
     config::Config,
     database::{Database, Sticky},
     filesystem::rtfd::RtfdBundle,
+    Result, StickyError,
 };
-use std::path::PathBuf;
 use uuid::Uuid;
-use std::process::Command;
 
 fn stickies_dir() -> Result<PathBuf> {
-    let home = std::env::var("HOME")
-        .map_err(|_| StickyError::StickiesNotFound("HOME not set".into()))?;
+    let home =
+        std::env::var("HOME").map_err(|_| StickyError::StickiesNotFound("HOME not set".into()))?;
 
-    Ok(PathBuf::from(home)
-        .join("Library/Containers/com.apple.Stickies/Data/Library/Stickies"))
+    Ok(PathBuf::from(home).join("Library/Containers/com.apple.Stickies/Data/Library/Stickies"))
 }
 
 fn reload_stickies_app() -> Result<()> {
     // Check if Stickies is running
-    let output = Command::new("pgrep")
-        .arg("Stickies")
-        .output()?;
+    let output = Command::new("pgrep").arg("Stickies").output()?;
 
     if output.status.success() {
         // Kill and restart for proper reload

@@ -1,11 +1,7 @@
 // ABOUTME: Show command implementation
 // ABOUTME: Displays the full content of a specific sticky by UUID
 
-use sticky_situation::{
-    Result, StickyError,
-    config::Config,
-    database::Database,
-};
+use sticky_situation::{config::Config, database::Database, Result, StickyError};
 
 pub fn run(uuid: &str) -> Result<()> {
     let config = Config::load()?;
@@ -27,8 +23,9 @@ pub fn run(uuid: &str) -> Result<()> {
 
             Ok(())
         }
-        None => {
-            Err(StickyError::Config(format!("Sticky with UUID {} not found", uuid)))
-        }
+        None => Err(StickyError::Config(format!(
+            "Sticky with UUID {} not found",
+            uuid
+        ))),
     }
 }

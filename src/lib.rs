@@ -3,10 +3,10 @@
 
 pub mod config;
 pub mod database;
-pub mod filesystem;
-pub mod sync;
-pub mod rtf;
 pub mod error;
+pub mod filesystem;
+pub mod rtf;
+pub mod sync;
 
 pub use error::StickyError;
 pub type Result<T> = std::result::Result<T, StickyError>;

@@ -9,7 +9,7 @@ pub fn extract_text(rtf: &str) -> String {
     let cleaned = control_re.replace_all(rtf, " ");
 
     // Remove braces
-    let cleaned = cleaned.replace('{', "").replace('}', "");
+    let cleaned = cleaned.replace(['{', '}'], "");
 
     // Collapse multiple spaces
     let space_re = Regex::new(r"\s+").unwrap();

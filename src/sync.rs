@@ -5,11 +5,11 @@ use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
 pub enum SyncAction {
-    NewOnFilesystem(String),   // UUID needs to be inserted into DB
-    NewInDatabase(String),      // UUID needs to be written to filesystem
-    UpdateFilesystem(String),   // DB version is newer
-    UpdateDatabase(String),     // Filesystem version is newer
-    NoChange(String),           // Timestamps match
+    NewOnFilesystem(String),  // UUID needs to be inserted into DB
+    NewInDatabase(String),    // UUID needs to be written to filesystem
+    UpdateFilesystem(String), // DB version is newer
+    UpdateDatabase(String),   // Filesystem version is newer
+    NoChange(String),         // Timestamps match
 }
 
 pub struct SyncEngine;
@@ -44,7 +44,7 @@ impl SyncEngine {
         }
 
         // Check for UUIDs only in database
-        for (uuid, _) in db_times {
+        for uuid in db_times.keys() {
             if !fs_uuids.contains(uuid) {
                 actions.push(SyncAction::NewInDatabase(uuid.clone()));
             }

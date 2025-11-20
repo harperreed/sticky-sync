@@ -2,7 +2,7 @@
 // ABOUTME: Handles schema creation, CRUD operations, and FTS5 full-text search
 
 use crate::Result;
-use rusqlite::{Connection, params, OptionalExtension};
+use rusqlite::{params, Connection, OptionalExtension};
 use std::cell::RefCell;
 use std::path::Path;
 
@@ -60,7 +60,9 @@ impl Database {
             [],
         )?;
 
-        Ok(Self { conn: RefCell::new(conn) })
+        Ok(Self {
+            conn: RefCell::new(conn),
+        })
     }
 
     pub fn connection(&self) -> &RefCell<Connection> {
@@ -111,18 +113,20 @@ impl Database {
              FROM stickies WHERE uuid = ?1"
         )?;
 
-        let sticky = stmt.query_row([uuid], |row| {
-            Ok(Sticky {
-                uuid: row.get(0)?,
-                content_text: row.get(1)?,
-                rtf_data: row.get(2)?,
-                plist_metadata: row.get(3)?,
-                color: row.get(4)?,
-                modified_at: row.get(5)?,
-                created_at: row.get(6)?,
-                source_machine: row.get(7)?,
+        let sticky = stmt
+            .query_row([uuid], |row| {
+                Ok(Sticky {
+                    uuid: row.get(0)?,
+                    content_text: row.get(1)?,
+                    rtf_data: row.get(2)?,
+                    plist_metadata: row.get(3)?,
+                    color: row.get(4)?,
+                    modified_at: row.get(5)?,
+                    created_at: row.get(6)?,
+                    source_machine: row.get(7)?,
+                })
             })
-        }).optional()?;
+            .optional()?;
 
         Ok(sticky)
     }
@@ -145,19 +149,20 @@ impl Database {
              WHERE stickies_fts MATCH ?1"
         )?;
 
-        let stickies = stmt.query_map([query], |row| {
-            Ok(Sticky {
-                uuid: row.get(0)?,
-                content_text: row.get(1)?,
-                rtf_data: row.get(2)?,
-                plist_metadata: row.get(3)?,
-                color: row.get(4)?,
-                modified_at: row.get(5)?,
-                created_at: row.get(6)?,
-                source_machine: row.get(7)?,
-            })
-        })?
-        .collect::<std::result::Result<Vec<_>, _>>()?;
+        let stickies = stmt
+            .query_map([query], |row| {
+                Ok(Sticky {
+                    uuid: row.get(0)?,
+                    content_text: row.get(1)?,
+                    rtf_data: row.get(2)?,
+                    plist_metadata: row.get(3)?,
+                    color: row.get(4)?,
+                    modified_at: row.get(5)?,
+                    created_at: row.get(6)?,
+                    source_machine: row.get(7)?,
+                })
+            })?
+            .collect::<std::result::Result<Vec<_>, _>>()?;
 
         Ok(stickies)
     }

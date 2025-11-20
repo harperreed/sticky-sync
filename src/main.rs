@@ -60,23 +60,11 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Sync { dry_run, verbose } => {
-            commands::sync::run(dry_run, verbose)
-        }
-        Commands::New { text } => {
-            commands::new::run(text)
-        }
-        Commands::Search { query, color } => {
-            commands::search::run(&query, color.as_deref())
-        }
-        Commands::List { color } => {
-            commands::list::run(color.as_deref())
-        }
-        Commands::Show { uuid } => {
-            commands::show::run(&uuid)
-        }
-        Commands::Hup => {
-            commands::hup::run()
-        }
+        Commands::Sync { dry_run, verbose } => commands::sync::run(dry_run, verbose),
+        Commands::New { text } => commands::new::run(text),
+        Commands::Search { query, color } => commands::search::run(&query, color.as_deref()),
+        Commands::List { color } => commands::list::run(color.as_deref()),
+        Commands::Show { uuid } => commands::show::run(&uuid),
+        Commands::Hup => commands::hup::run(),
     }
 }

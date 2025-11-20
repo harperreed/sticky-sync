@@ -19,7 +19,9 @@ fn test_schema_created() {
 
     // Verify tables exist
     let conn = db.connection().borrow();
-    let mut stmt = conn.prepare("SELECT name FROM sqlite_master WHERE type='table'").unwrap();
+    let mut stmt = conn
+        .prepare("SELECT name FROM sqlite_master WHERE type='table'")
+        .unwrap();
     let tables: Vec<String> = stmt
         .query_map([], |row| row.get(0))
         .unwrap()

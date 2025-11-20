@@ -1,6 +1,6 @@
-use sticky_situation::filesystem::rtfd::{RtfdBundle, Attachment};
-use tempfile::tempdir;
 use std::fs;
+use sticky_situation::filesystem::rtfd::{Attachment, RtfdBundle};
+use tempfile::tempdir;
 
 #[test]
 fn test_write_rtfd_bundle() {
@@ -28,12 +28,10 @@ fn test_write_rtfd_with_attachments() {
 
     let bundle = RtfdBundle {
         rtf_data: b"{\\rtf1 Test}".to_vec(),
-        attachments: vec![
-            Attachment {
-                filename: "IMG_001.tiff".to_string(),
-                content: b"fake image".to_vec(),
-            },
-        ],
+        attachments: vec![Attachment {
+            filename: "IMG_001.tiff".to_string(),
+            content: b"fake image".to_vec(),
+        }],
     };
 
     bundle.write(&rtfd_path).unwrap();

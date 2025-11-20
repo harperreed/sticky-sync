@@ -1,6 +1,6 @@
+use std::fs;
 use sticky_situation::filesystem::rtfd::RtfdBundle;
 use tempfile::tempdir;
-use std::fs;
 
 #[test]
 fn test_read_rtfd_bundle() {

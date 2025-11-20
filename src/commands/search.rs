@@ -1,11 +1,7 @@
 // ABOUTME: Search command implementation
 // ABOUTME: Full-text search using SQLite FTS5 with optional color filtering
 
-use sticky_situation::{
-    Result,
-    config::Config,
-    database::Database,
-};
+use sticky_situation::{config::Config, database::Database, Result};
 
 pub fn run(query: &str, color: Option<&str>) -> Result<()> {
     let config = Config::load()?;
@@ -15,7 +11,7 @@ pub fn run(query: &str, color: Option<&str>) -> Result<()> {
 
     let filtered: Vec<_> = results
         .iter()
-        .filter(|s| color.map_or(true, |c| s.color == c))
+        .filter(|s| color.is_none_or(|c| s.color == c))
         .collect();
 
     if filtered.is_empty() {

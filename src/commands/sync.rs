@@ -1,27 +1,27 @@
 // ABOUTME: Sync command implementation
 // ABOUTME: Orchestrates bidirectional sync between Stickies.app and database
 
+use std::collections::HashMap;
+use std::path::PathBuf;
 use sticky_situation::{
-    Result, StickyError,
     config::Config,
     database::{Database, Sticky},
     filesystem::{plist, rtfd::RtfdBundle},
-    sync::{SyncEngine, SyncAction},
     rtf,
+    sync::{SyncAction, SyncEngine},
+    Result, StickyError,
 };
-use std::collections::HashMap;
-use std::path::PathBuf;
 
 fn stickies_dir() -> Result<PathBuf> {
-    let home = std::env::var("HOME")
-        .map_err(|_| StickyError::StickiesNotFound("HOME not set".into()))?;
+    let home =
+        std::env::var("HOME").map_err(|_| StickyError::StickiesNotFound("HOME not set".into()))?;
 
-    let path = PathBuf::from(home)
-        .join("Library/Containers/com.apple.Stickies/Data/Library/Stickies");
+    let path =
+        PathBuf::from(home).join("Library/Containers/com.apple.Stickies/Data/Library/Stickies");
 
     if !path.exists() {
         return Err(StickyError::StickiesNotFound(
-            "Stickies directory not found. Have you launched Stickies.app?".into()
+            "Stickies directory not found. Have you launched Stickies.app?".into(),
         ));
     }
 
@@ -42,7 +42,7 @@ pub fn run(dry_run: bool, verbose: bool) -> Result<()> {
     let mut fs_uuids = Vec::new();
     let mut fs_times = HashMap::new();
 
-    for (uuid, _) in &metadata_map {
+    for uuid in metadata_map.keys() {
         let rtfd_path = stickies_path.join(format!("{}.rtfd", uuid));
         if rtfd_path.exists() {
             fs_uuids.push(uuid.clone());
@@ -86,7 +86,7 @@ pub fn run(dry_run: bool, verbose: bool) -> Result<()> {
                         uuid: uuid.clone(),
                         content_text: rtf::extract_text_from_bytes(&bundle.rtf_data),
                         rtf_data: bundle.rtf_data,
-                        plist_metadata: vec![],  // TODO: serialize metadata
+                        plist_metadata: vec![], // TODO: serialize metadata
                         color: metadata.color_name().to_string(),
                         modified_at: fs_times.get(&uuid).copied().unwrap_or(0),
                         created_at: fs_times.get(&uuid).copied().unwrap_or(0),

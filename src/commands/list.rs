@@ -1,11 +1,7 @@
 // ABOUTME: List command implementation
 // ABOUTME: Lists all stickies with optional color filtering
 
-use sticky_situation::{
-    Result,
-    config::Config,
-    database::Database,
-};
+use sticky_situation::{config::Config, database::Database, Result};
 
 pub fn run(color: Option<&str>) -> Result<()> {
     let config = Config::load()?;
@@ -21,7 +17,7 @@ pub fn run(color: Option<&str>) -> Result<()> {
     let mut stickies = Vec::new();
     for uuid in all_uuids {
         if let Some(sticky) = db.get_sticky(&uuid)? {
-            if color.map_or(true, |c| sticky.color == c) {
+            if color.is_none_or(|c| sticky.color == c) {
                 stickies.push(sticky);
             }
         }
