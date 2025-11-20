@@ -33,7 +33,12 @@ sticky sync --dry-run --verbose
 
 ```bash
 sticky new "My new sticky note"
+
+# After creating, sync to import the sticky with Stickies.app's UUID
+sticky sync
 ```
+
+**Note**: Stickies.app assigns its own UUID when importing new stickies, so you should run `sync` after creating to update your database with the correct UUID.
 
 ### Search stickies
 
@@ -85,6 +90,12 @@ conflict_log_path = "~/.local/share/sticky-situation/conflicts.log"
 3. Reads each `<UUID>.rtfd/` bundle (RTF + attachments)
 4. Syncs to SQLite with last-write-wins conflict resolution
 5. Full-text search using FTS5
+
+## Known Limitations
+
+- **Window positioning**: When creating new stickies via `sticky new`, Stickies.app manages window positioning using its own internal logic. The CLI cannot control where new sticky windows appear on screen - they will be positioned by Stickies.app when it reloads.
+
+- **UUID assignment**: Stickies.app assigns its own UUID to newly created stickies when it imports them. After running `sticky new`, you should run `sticky sync` to update your database with the UUID that Stickies.app assigned.
 
 ## Architecture
 

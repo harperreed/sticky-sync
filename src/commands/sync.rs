@@ -35,8 +35,8 @@ pub fn run(dry_run: bool, verbose: bool) -> Result<()> {
     let db = Database::create(&config.database_path)?;
     let stickies_path = stickies_dir()?;
 
-    // Read filesystem state
-    let plist_path = stickies_path.join("StickiesState.plist");
+    // Read filesystem state from .SavedStickiesState (the actual file Stickies.app uses)
+    let plist_path = stickies_path.join(".SavedStickiesState");
     let metadata_map = plist::read_stickies_state(&plist_path)?;
 
     let mut fs_uuids = Vec::new();

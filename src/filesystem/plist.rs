@@ -57,6 +57,25 @@ pub fn read_stickies_state(path: &Path) -> Result<HashMap<String, StickyMetadata
     }
 
     let value = Value::from_file(path)?;
+
+    // Try array format first (.SavedStickiesState)
+    if let Some(array) = value.as_array() {
+        let mut result = HashMap::new();
+
+        for entry in array {
+            if let Some(dict) = entry.as_dictionary() {
+                // Extract UUID from dictionary value
+                if let Some(Value::String(uuid)) = dict.get("UUID") {
+                    let metadata = StickyMetadata::from_plist_dict(dict)?;
+                    result.insert(uuid.to_lowercase(), metadata);
+                }
+            }
+        }
+
+        return Ok(result);
+    }
+
+    // Fall back to dictionary format (StickiesState.plist)
     let dict = value.as_dictionary()
         .ok_or_else(|| StickyError::Config("Invalid plist format".into()))?;
 
