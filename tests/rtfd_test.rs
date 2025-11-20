@@ -1,4 +1,5 @@
 use std::fs;
+#[cfg(unix)]
 use std::os::unix::fs::PermissionsExt;
 use sticky_situation::filesystem::rtfd::RtfdBundle;
 use tempfile::tempdir;
@@ -52,6 +53,7 @@ fn test_read_nonexistent_rtfd() {
 }
 
 #[test]
+#[cfg(unix)]
 fn test_read_rtfd_with_permission_denied() {
     let dir = tempdir().unwrap();
     let rtfd_dir = dir.path().join("test.rtfd");

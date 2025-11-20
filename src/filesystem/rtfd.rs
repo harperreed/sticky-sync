@@ -71,11 +71,50 @@ impl RtfdBundle {
         fs::write(&rtf_path, &self.rtf_data)?;
 
         for attachment in &self.attachments {
-            let attachment_path = rtfd_path.join(&attachment.filename);
+            // Validate filename to prevent path traversal attacks
+            let safe_filename = Self::sanitize_filename(&attachment.filename)?;
+            let attachment_path = rtfd_path.join(safe_filename);
             fs::write(&attachment_path, &attachment.content)?;
         }
 
         Ok(())
+    }
+
+    /// Sanitize filename to prevent path traversal attacks
+    fn sanitize_filename(filename: &str) -> Result<&str> {
+        // Reject empty filenames
+        if filename.is_empty() {
+            return Err(StickyError::Io(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Attachment filename cannot be empty",
+            )));
+        }
+
+        // Reject absolute paths
+        if filename.starts_with('/') || filename.starts_with('\\') {
+            return Err(StickyError::Io(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Attachment filename cannot be an absolute path",
+            )));
+        }
+
+        // Reject path traversal sequences
+        if filename.contains("..") {
+            return Err(StickyError::Io(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Attachment filename cannot contain '..'",
+            )));
+        }
+
+        // Reject directory separators (filename must be in same directory)
+        if filename.contains('/') || filename.contains('\\') {
+            return Err(StickyError::Io(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Attachment filename cannot contain directory separators",
+            )));
+        }
+
+        Ok(filename)
     }
 
     pub fn create_minimal(text: &str) -> Self {

@@ -2,17 +2,22 @@
 // ABOUTME: Simple regex-based stripper to extract plain text from RTF data
 
 use regex::Regex;
+use std::sync::OnceLock;
+
+// Compile regexes once at first use for performance
+static CONTROL_RE: OnceLock<Regex> = OnceLock::new();
+static SPACE_RE: OnceLock<Regex> = OnceLock::new();
 
 pub fn extract_text(rtf: &str) -> String {
     // Remove RTF control sequences like \rtf1, \ansi, etc.
-    let control_re = Regex::new(r"\\[a-z]+[0-9]*\s*").unwrap();
+    let control_re = CONTROL_RE.get_or_init(|| Regex::new(r"\\[a-z]+[0-9]*\s*").unwrap());
     let cleaned = control_re.replace_all(rtf, " ");
 
     // Remove braces
     let cleaned = cleaned.replace(['{', '}'], "");
 
     // Collapse multiple spaces
-    let space_re = Regex::new(r"\s+").unwrap();
+    let space_re = SPACE_RE.get_or_init(|| Regex::new(r"\s+").unwrap());
     let cleaned = space_re.replace_all(&cleaned, " ");
 
     cleaned.trim().to_string()

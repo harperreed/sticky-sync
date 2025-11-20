@@ -7,21 +7,11 @@ pub fn run(color: Option<&str>) -> Result<()> {
     let config = Config::load()?;
     let db = Database::create(&config.database_path)?;
 
-    let all_uuids = db.get_all_uuids()?;
-
-    if all_uuids.is_empty() {
-        println!("No stickies found in database");
-        return Ok(());
-    }
-
-    let mut stickies = Vec::new();
-    for uuid in all_uuids {
-        if let Some(sticky) = db.get_sticky(&uuid)? {
-            if color.is_none_or(|c| sticky.color == c) {
-                stickies.push(sticky);
-            }
-        }
-    }
+    // Use efficient single query instead of N+1 pattern
+    let stickies = match color {
+        Some(c) => db.get_stickies_by_color(c)?,
+        None => db.get_all_stickies()?,
+    };
 
     if stickies.is_empty() {
         if let Some(c) = color {

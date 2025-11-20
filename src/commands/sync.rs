@@ -2,38 +2,21 @@
 // ABOUTME: Orchestrates bidirectional sync between Stickies.app and database
 
 use std::collections::HashMap;
-use std::path::PathBuf;
 use sticky_situation::{
     config::Config,
     database::{Database, Sticky},
-    filesystem::{plist, rtfd::RtfdBundle},
+    filesystem::{self, plist, rtfd::RtfdBundle},
     rtf,
     sync::{SyncAction, SyncEngine},
-    Result, StickyError,
+    Result,
 };
-
-fn stickies_dir() -> Result<PathBuf> {
-    let home =
-        std::env::var("HOME").map_err(|_| StickyError::StickiesNotFound("HOME not set".into()))?;
-
-    let path =
-        PathBuf::from(home).join("Library/Containers/com.apple.Stickies/Data/Library/Stickies");
-
-    if !path.exists() {
-        return Err(StickyError::StickiesNotFound(
-            "Stickies directory not found. Have you launched Stickies.app?".into(),
-        ));
-    }
-
-    Ok(path)
-}
 
 pub fn run(dry_run: bool, verbose: bool) -> Result<()> {
     let config = Config::load()?;
     config.ensure_dirs()?;
 
     let db = Database::create(&config.database_path)?;
-    let stickies_path = stickies_dir()?;
+    let stickies_path = filesystem::stickies_dir()?;
 
     // Read filesystem state from .SavedStickiesState (the actual file Stickies.app uses)
     let plist_path = stickies_path.join(".SavedStickiesState");

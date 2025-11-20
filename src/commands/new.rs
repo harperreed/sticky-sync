@@ -1,22 +1,14 @@
 // ABOUTME: New command implementation
 // ABOUTME: Creates new sticky in filesystem and database, then reloads Stickies.app
 
-use std::path::PathBuf;
 use std::process::Command;
 use sticky_situation::{
     config::Config,
     database::{Database, Sticky},
-    filesystem::rtfd::RtfdBundle,
+    filesystem::{self, rtfd::RtfdBundle},
     Result, StickyError,
 };
 use uuid::Uuid;
-
-fn stickies_dir() -> Result<PathBuf> {
-    let home =
-        std::env::var("HOME").map_err(|_| StickyError::StickiesNotFound("HOME not set".into()))?;
-
-    Ok(PathBuf::from(home).join("Library/Containers/com.apple.Stickies/Data/Library/Stickies"))
-}
 
 fn reload_stickies_app() -> Result<()> {
     // Check if Stickies is running
@@ -48,7 +40,7 @@ pub fn run(text: Option<String>) -> Result<()> {
     config.ensure_dirs()?;
 
     let db = Database::create(&config.database_path)?;
-    let stickies_path = stickies_dir()?;
+    let stickies_path = filesystem::stickies_dir()?;
 
     let uuid = Uuid::new_v4().to_string();
     let bundle = RtfdBundle::create_minimal(&content);

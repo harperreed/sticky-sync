@@ -4,6 +4,11 @@
 use sticky_situation::{config::Config, database::Database, Result, StickyError};
 
 pub fn run(uuid: &str) -> Result<()> {
+    // Validate UUID format
+    if uuid.trim().is_empty() {
+        return Err(StickyError::NotFound("UUID cannot be empty".to_string()));
+    }
+
     let config = Config::load()?;
     let db = Database::create(&config.database_path)?;
 
@@ -23,7 +28,7 @@ pub fn run(uuid: &str) -> Result<()> {
 
             Ok(())
         }
-        None => Err(StickyError::Config(format!(
+        None => Err(StickyError::NotFound(format!(
             "Sticky with UUID {} not found",
             uuid
         ))),

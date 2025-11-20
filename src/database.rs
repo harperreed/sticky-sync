@@ -140,6 +140,56 @@ impl Database {
         Ok(uuids)
     }
 
+    pub fn get_all_stickies(&self) -> Result<Vec<Sticky>> {
+        let conn = self.conn.borrow();
+        let mut stmt = conn.prepare(
+            "SELECT uuid, content_text, rtf_data, plist_metadata, color, modified_at, created_at, source_machine
+             FROM stickies"
+        )?;
+
+        let stickies = stmt
+            .query_map([], |row| {
+                Ok(Sticky {
+                    uuid: row.get(0)?,
+                    content_text: row.get(1)?,
+                    rtf_data: row.get(2)?,
+                    plist_metadata: row.get(3)?,
+                    color: row.get(4)?,
+                    modified_at: row.get(5)?,
+                    created_at: row.get(6)?,
+                    source_machine: row.get(7)?,
+                })
+            })?
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+
+        Ok(stickies)
+    }
+
+    pub fn get_stickies_by_color(&self, color: &str) -> Result<Vec<Sticky>> {
+        let conn = self.conn.borrow();
+        let mut stmt = conn.prepare(
+            "SELECT uuid, content_text, rtf_data, plist_metadata, color, modified_at, created_at, source_machine
+             FROM stickies WHERE color = ?1"
+        )?;
+
+        let stickies = stmt
+            .query_map([color], |row| {
+                Ok(Sticky {
+                    uuid: row.get(0)?,
+                    content_text: row.get(1)?,
+                    rtf_data: row.get(2)?,
+                    plist_metadata: row.get(3)?,
+                    color: row.get(4)?,
+                    modified_at: row.get(5)?,
+                    created_at: row.get(6)?,
+                    source_machine: row.get(7)?,
+                })
+            })?
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+
+        Ok(stickies)
+    }
+
     pub fn search(&self, query: &str) -> Result<Vec<Sticky>> {
         let conn = self.conn.borrow();
         let mut stmt = conn.prepare(

@@ -22,4 +22,7 @@ pub enum StickyError {
 
     #[error("RTF parsing error: {0}")]
     RtfParse(String),
+
+    #[error("Not found: {0}")]
+    NotFound(String),
 }
