@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "sticky"
+name = "sticky-sync"
 path = "src/main.rs"
 
 [dependencies]
