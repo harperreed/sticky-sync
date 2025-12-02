@@ -194,9 +194,18 @@ fn test_database_with_readonly_path() {
     let result = Database::create(&db_path);
 
     // Clean up - remove readonly before temp dir cleanup
-    let mut perms = fs::metadata(&db_path).unwrap().permissions();
-    perms.set_readonly(false);
-    fs::set_permissions(&db_path, perms).unwrap();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let perms = fs::Permissions::from_mode(0o644);
+        fs::set_permissions(&db_path, perms).unwrap();
+    }
+    #[cfg(not(unix))]
+    {
+        let mut perms = fs::metadata(&db_path).unwrap().permissions();
+        perms.set_readonly(false);
+        fs::set_permissions(&db_path, perms).unwrap();
+    }
 
     // Database should open successfully (SQLite can open readonly)
     assert!(result.is_ok());
